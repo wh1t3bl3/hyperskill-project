@@ -1,0 +1,119 @@
+import random
+
+computer_options = ['scissors', 'paper', 'rock']
+random.shuffle(computer_options)
+computer_decision = random.choice(computer_options)
+
+number_option = {'1': {'2', '3'},
+                 '2': {'3', '4'},
+                 '3': {'4', '5'},
+                 '4': {'5', '1'},
+                 '5': {'1', '2'}}
+
+three_option = {'paper': 'scissors',
+                'scissors': 'rock',
+                'rock': 'paper'}
+
+fif_option = {'rock': {'gun', 'lightning', 'devil', 'dragon', 'water', 'air', 'paper'},
+              'gun': {'lightning', 'devil', 'dragon', 'water', 'air', 'paper', 'sponge'},
+              'lightning': {'devil', 'dragon', 'water', 'air', 'paper', 'sponge', 'wolf'},
+              'devil': {'dragon', 'water', 'air', 'paper', 'sponge', 'wolf', 'tree'},
+              'dragon': {'water', 'air', 'paper', 'sponge', 'wolf', 'tree', 'human'},
+              'water': {'air', 'paper', 'sponge', 'wolf', 'tree', 'human', 'snake'},
+              'air': {'paper', 'sponge', 'wolf', 'tree', 'human', 'snake', 'scissors'},
+              'paper': {'sponge', 'wolf', 'tree', 'human', 'snake', 'scissors', 'fire'},
+              'sponge': {'wolf', 'tree', 'human', 'snake', 'scissors', 'fire', 'rock'},
+              'wolf': {'tree', 'human', 'snake', 'scissors', 'fire', 'rock', 'gun'},
+              'tree': {'human', 'snake', 'scissors', 'fire', 'rock', 'gun', 'lightning'},
+              'human': {'snake', 'scissors', 'fire', 'rock', 'gun', 'lightning', 'devil'},
+              'snake': {'scissors', 'fire', 'rock', 'gun', 'lightning', 'devil', 'dragon'},
+              'scissors': {'fire', 'rock', 'gun', 'lightning', 'devil', 'dragon', 'water'},
+              'fire': {'rock', 'gun', 'lightning', 'devil', 'dragon', 'water', 'air'}}
+
+# -------------------------------------------------------------------------------
+dictionary_names = {}
+# --------------------------------------------------------------------------------
+
+ratings_file = open('rating.txt')
+ratings = {name: int(rating) for name, rating in [line.split() for line in ratings_file]}
+ratings_file.close()
+
+player_name = input("Enter your name: ").strip()
+player_rating = ratings.get(player_name, 0)
+print(f"Hello, {player_name}")
+
+user_input = input()
+if user_input.split(',')[0] in fif_option:
+    computer_options.extend(user_input.split(','))
+    random.shuffle(computer_options)
+    computer_decision = random.choice(computer_options)
+    print('Okay, let\'s start')
+    while True:
+        user_option = input()
+        if user_option != '!exit':
+            if user_option != '!rating':
+                if user_option in fif_option:
+                    if computer_decision in fif_option[user_option]:
+                        print(f'Sorry, but computer chose {computer_decision}')
+                    elif computer_decision == user_option:
+                        print(f'There is a draw ({computer_decision})')
+                        player_rating += 50
+                    else:
+                        print(f'Well done. Computer chose {computer_decision} and failed')
+                        player_rating += 100
+                else:
+                    print("Invalid input")
+            else:
+                print(f'Your rating: {player_rating}')
+        else:
+            print('Bye!')
+            break
+elif user_input == '':
+    print('Okay, let\'s start')
+    while True:
+        user_option = input()
+        if user_option != '!exit':
+            if user_option != '!rating':
+                if user_option in three_option:
+                    if computer_decision in three_option[user_option]:
+                        print(f'Sorry, but computer chose {computer_decision}')
+                    elif computer_decision == user_option:
+                        print(f'There is a draw ({computer_decision})')
+                        player_rating += 50
+                    else:
+                        print(f'Well done. Computer chose {computer_decision} and failed')
+                        player_rating += 100
+                else:
+                    print('Invalid input')
+            else:
+                print(f'Your rating: {player_rating}')
+        else:
+            print('Bye!')
+            break
+else:
+    computer_number_options = [x for x in user_input.split(',')]
+    random.shuffle(computer_number_options)
+    computer_number_decision = random.choice(computer_number_options)
+    print('Okay, let\'s start')
+    while True:
+        user_option = input()
+        if user_option != '!exit':
+            if user_option != '!rating':
+                if user_option in number_option:
+                    if computer_number_decision in number_option[user_option]:
+                        print(f'Sorry, but computer chose {computer_number_decision}')
+                    elif computer_number_decision == user_option:
+                        print(f'There is a draw ({computer_number_decision})')
+                        player_rating += 50
+                    else:
+                        print(f'Well done. Computer chose {computer_number_decision} and failed')
+                        player_rating += 100
+                else:
+                    print("Invalid input")
+                    print(type(user_input))
+                    print(type(computer_number_decision))
+            else:
+                print(f'Your rating: {player_rating}')
+        else:
+            print('Bye!')
+            break
