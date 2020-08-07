@@ -1,0 +1,278 @@
+import re
+
+
+class SmartCalculater:
+    def __init__(self):
+        self.stack = []
+        self.dict = {}
+    def push(self, item):
+        self.stack.append(item)
+    def add(self, variable):
+        self.dict[variable[0]] = variable[2]
+    def pop(self):
+        result = 0
+        if self.stack != []:
+            result = self.stack.pop()
+        return result
+
+    def isEmpty(self):
+        return self.stack == []
+    def topChar(self):
+        result = 0
+        if self.stack != []:
+            result = self.stack[len(self.stack) - 1]
+        return result
+
+
+# Check it if it Number or Operand
+def isNumber(char):
+    return char.lstrip("+-").isdigit()
+def isOperand(char):
+    return char.lstrip("+-").isalpha()
+# check it if it is correct form
+def check_parathenses_Expression(change_expression):
+    count = 0
+    for char in change_expression:
+        if char == "(":
+            count += 1
+        elif char == ")":
+            count -= 1
+    if count == 0:
+        return True
+def check_operator_Expression(change_expression):
+    for char in change_expression:
+        if "*" in char and len(char) > 1:
+            return True
+        elif "/" in char and len(char) > 1:
+            return True
+        elif "^" in char and len(char) > 1:
+            return True
+# work with variable
+def variable_identifier(variable):
+    if len(variable) == 3:
+        string = ""
+        string += variable[0]
+        return string.isalpha()
+def value_number_identifier(variable):
+    if len(variable) == 3:
+        if variable[2].lstrip("+-").isdigit():
+            return True
+def value_alpha_identifier(variable):
+    if len(variable) == 3:
+        string = ""
+        string += variable[0]
+        if variable[2].isalpha():
+            return True
+def value_alpha(variable):
+    if variable[2] in vaDict.dict.keys():
+        variable[2] = vaDict.dict[variable[2]]
+    return variable
+
+
+def assignment_idenfier(variable):
+    return variable.count("=") == 1
+# Convert variable to a number
+def convertVariable(dictionary):
+    for index, variable in enumerate(postfix):
+        if postfix[index] in dictionary.keys():
+            postfix[index] = dictionary[variable]
+    return postfix
+
+
+# check postfix is all num
+def check_variable(postfix):
+    for char in postfix:
+        if char.lstrip("+-").isdigit():
+            pass
+        elif char in ("+-*/^"):
+            pass
+        else:
+            return True
+# check it if it's a letter:
+def isLetter(user_input):
+    for char in user_input:
+        if char in re.findall('[a-zA-Z]', user_input):
+            return True
+# ----------------------------------
+def command_promt(command):
+    command_list = ['help', 'exit']
+    if command[0] == '/':
+        if command[1] in command_list:
+            if command[1] == 'help':
+                return 'This program calculates the sum of the numbers'
+            elif command[2] == 'exit':
+                return '!Bye'
+        else:
+            return 'Uknown command'
+# -----------------------------------
+operators = "+-*/^"
+def isOperator(char):
+    return char in operators
+
+
+def getPrecedence(char):
+    result = 0
+    for operator in operators:
+        result += 1
+        if operator == char:
+            if operator == "-/":
+                result -= 1
+            break
+    return result
+
+
+def changeExpression(expression):
+    if " " not in expression:
+        expression = re.findall('[+-/^/*//()]|[a-zA-Z]+|\d+', expression)
+    else:
+        expression = expression.replace("(", "( ")
+        expression = expression.replace(")", " )")
+        expression = expression.split()
+        for index, char in enumerate(expression):
+            if '+' in char and len(char) > 1:
+                expression[index] = '+'
+            if '-' in char and len(char) > 1:
+                if len(char) % 2 == 0:
+                    expression[index] = '+'
+                else:
+                    expression[index] = '-'
+    return expression
+
+
+def toPostfix(expression):
+    plist = []
+    stack = SmartCalculater()
+    for char in expression:
+        if isNumber(char):
+            plist.append(char)
+        elif isOperand(char):
+            plist.append(char)
+        elif isOperator(char):
+            while True:
+                topChar = stack.topChar()
+                if stack.isEmpty() or topChar == '(':
+                    stack.push(char)
+                    break
+                else:
+                    pC = getPrecedence(char)  # character that wee need to compare with the top
+                    pTC = getPrecedence(topChar)  # character on the top of the stack
+                    if pC > pTC:
+                        stack.push(char)
+                        break
+                    else:
+                        plist.append(stack.pop())
+        elif char == '(':
+            stack.push(char)
+        elif char == ')':
+            cpop = stack.pop()
+            while cpop != '(':
+                plist.append(cpop)
+                cpop = stack.pop()
+    while not stack.isEmpty():
+        cpop = stack.pop()
+        plist.append(cpop)
+    return plist
+
+
+# postfix to answer
+def doMath(op, operand_1, operand_2):
+    if op == '^':
+        return operand_1 ** operand_2
+    elif op == '*':
+        return operand_1 * operand_2
+    elif op == '/':
+        return int(operand_1 / operand_2)
+    elif op == '+':
+        return operand_1 + operand_2
+    else:
+        return operand_1 - operand_2
+
+
+def postfixEval(expression):
+    stack = SmartCalculater()
+    for token in expression:
+        if token.lstrip("-+").isnumeric():
+            stack.push(int(token))
+        else:
+            operand_2 = stack.pop()
+            operand_1 = stack.pop()
+            calculate = doMath(token, operand_1, operand_2)
+            stack.push(calculate)
+    return stack.pop()
+# change version of expression to easily calculate, which is infix
+# change_expression = changeExpression(input())
+# change infix to postfix
+# postfix = toPostfix(change_expression)
+# then from postfix to answer
+# calculate = postfixEval(postfix)
+dictionary = SmartCalculater()
+vaDict = dictionary
+while True:
+    user_input = input()
+    variable = re.findall('[a-zA-Z]+[0-9]?|=|[-+=!@#$%^&*(){}:"<>?_]?-?\d+[-+=!@#$%^&*(){}:"<>?_]?', user_input)
+    command = re.findall('/|[a-zA-Z]+', user_input)
+    if len(user_input) == 0:
+        continue
+    if user_input.startswith('/'):
+        command_do = ['help', 'exit']
+        if len(command) == 2:
+            if command[0] == '/':
+                if command[1] in command_do:
+                    if command[1] == 'help':
+                        print("This program calculates the sum of numbers")
+                    elif command[1] == 'exit':
+                        print("!Bye")
+                        break
+                else:
+                    print("Unknown command")
+    else:
+        if "=" not in variable:
+            if not isLetter(user_input):
+                change_expression = changeExpression(user_input)  # change version of expression to easily calculate, which is infix
+                if check_parathenses_Expression(change_expression):
+                    if not check_operator_Expression(change_expression):
+                        postfix = toPostfix(change_expression)  # change infix to postfix
+                        calculate = postfixEval(postfix)  # then from postfix to answer
+                        print(calculate)
+                    else:
+                        print("Invalid expression")
+                else:
+                    print("Invalid expression")
+                    # print(postfix)
+            else:
+                change_expression = changeExpression(user_input)
+                postfix = toPostfix(change_expression)
+                convertVariable(vaDict.dict)
+                if postfix[0].isalpha():
+                    print("Unknown variable")
+                else:
+                    if check_parathenses_Expression(change_expression):
+                        if not check_operator_Expression(change_expression):
+                            if not check_variable(postfix):
+                                calculate = postfixEval(postfix)
+                                print(calculate)
+                            else:
+                                print("Invalid expression")
+                        else:
+                            print("Invalid expression")
+                    else:
+                        print("Invalid expression")
+        else:
+            if not variable_identifier(variable):
+                print("Invalid identifier")
+            elif not assignment_idenfier(variable):
+                print("Invalid assignment")
+            else:
+                if value_number_identifier(variable):
+                    vaDict.add(variable)
+                    # print(vaDict.dict)
+                elif value_alpha_identifier(variable):
+                    if variable[2] in vaDict.dict.keys():
+                        variable[2] = vaDict.dict[variable[2]]
+                        vaDict.add(variable)
+                        # print(vaDict.dict)
+                    else:
+                        print("Unknown variable")
+                else:
+
+                    print("Invalid assignment")
